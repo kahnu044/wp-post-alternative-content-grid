@@ -117,6 +117,11 @@ function wp_load_more_posts_handler()
         endwhile;
     }
 
-    echo $content;
-    exit;
+    $result = [
+        'total_page' => $all_posts->max_num_pages, // get total no of pages
+        'content' => $content,
+    ];
+
+    echo json_encode($result);
+    die();
 }
