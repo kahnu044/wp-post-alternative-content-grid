@@ -81,8 +81,10 @@ add_action('wp_ajax_nopriv_wp_load_more_posts', 'wp_load_more_posts_handler');
 
 function wp_load_more_posts_handler()
 {
+    $postType = $_POST['postType'];
+
     $all_posts = new WP_Query([
-        'post_type' => 'post',
+        'post_type' => $postType,
         'posts_per_page' => 6,
         'orderby' => 'date',
         'order' => 'DESC',

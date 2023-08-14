@@ -4,6 +4,9 @@ jQuery(document).ready(function () {
     // Load more
     let currentPage = 1;
     jQuery('#wp-load-more-post').on('click', function () {
+
+        var postType = jQuery(this).data('post-type') || 'post';
+
         currentPage++;
 
         jQuery.ajax({
@@ -13,6 +16,7 @@ jQuery(document).ready(function () {
             data: {
                 action: 'wp_load_more_posts',
                 paged: currentPage,
+                postType: postType
             },
             success: function (response) {
 
