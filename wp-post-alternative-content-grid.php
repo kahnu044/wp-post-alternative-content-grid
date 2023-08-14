@@ -12,7 +12,8 @@
 // Enqueue CSS and Js
 function wp_post_grid_styles_and_scripts()
 {
-    wp_enqueue_script('main-script', plugins_url('assets/js/main.js', __FILE__), array('jquery'), null, true);
+    wp_enqueue_script('main-script', plugins_url('assets/js/main.js', __FILE__), array('jquery'), '444null', true);
+    wp_enqueue_style('main-style', plugins_url('assets/css/style.css', __FILE__), array(), null, false);
 
     // Localize the script with data
     wp_localize_script(
@@ -40,42 +41,26 @@ function wp_post_custom_post_grid_handler($atts, $content = null)
         $atts
     );
 
+    $content = '<section class="wp-post-alternative-grids">';
+
     $all_posts = new WP_Query([
         'post_type' => 'post',
         'posts_per_page' => 2,
         'orderby' => 'date',
-        'order' => 'DESC',
+        'order' => 'ASC',
         'paged' => 1,
     ]);
 
-    if ($all_posts->have_posts()) {
-        $content = '<ul class="wp-grid-post-list">';
-        while ($all_posts->have_posts()) : $all_posts->the_post();
-            // Get post data
-            $post_title = get_the_title();
-            $post_excerpt = get_the_excerpt();
-            $post_permalink = get_permalink();
-            $post_author = get_the_author();
-            $post_date = get_the_date();
-            $post_featured_image = get_the_post_thumbnail();
+    $content .= get_post_grid_template($all_posts);
 
-            // Build the HTML for each post
-            $content .= '<li class="wp-grid-post-item">';
-            $content .= '<h2 class="wp-grid-post-title"><a href="' . $post_permalink . '">' . $post_title . '</a></h2>';
-            $content .= '<div class="wp-grid-post-excerpt">' . $post_excerpt . '</div>';
-            $content .= '<div class="wp-grid-post-author">' . __('Author: ', 'textdomain') . $post_author . '</div>';
-            $content .= '<div class="wp-grid-post-date">' . __('Date: ', 'textdomain') . $post_date . '</div>';
-            $content .= '<div class="wp-grid-post-featured-image">' . $post_featured_image . '</div>';
-            $content .= '</li>';
-        endwhile;
-        $content .= '</ul>';
-    }
+    $content .= '</section>';
     wp_reset_postdata();
 
-    $content .= '<div class="btn__wrapper">
+
+    $content .= '<div class="wp-post-grid-load-more">
                     <a href="#!" class="btn" id="wp-load-more-post">Load more</a>
                 </div>';
-
+    $content .= '</section>';
     return $content;
 }
 
@@ -95,27 +80,7 @@ function wp_load_more_posts_handler()
         'paged' => $_POST['paged'],
     ]);
 
-    $content = '';
-
-    if ($all_posts->have_posts()) {
-        while ($all_posts->have_posts()) : $all_posts->the_post();
-
-            $post_title = get_the_title();
-            $post_excerpt = get_the_excerpt();
-            $post_permalink = get_permalink();
-            $post_author = get_the_author();
-            $post_date = get_the_date();
-            $post_featured_image = get_the_post_thumbnail();
-
-            $content .= '<li class="wp-grid-post-item">';
-            $content .= '<h2 class="wp-grid-post-title"><a href="' . $post_permalink . '">' . $post_title . '</a></h2>';
-            $content .= '<div class="wp-grid-post-excerpt">' . $post_excerpt . '</div>';
-            $content .= '<div class="wp-grid-post-author">' . __('Author: ', 'textdomain') . $post_author . '</div>';
-            $content .= '<div class="wp-grid-post-date">' . __('Date: ', 'textdomain') . $post_date . '</div>';
-            $content .= '<div class="wp-grid-post-featured-image">' . $post_featured_image . '</div>';
-            $content .= '</li>';
-        endwhile;
-    }
+    $content = get_post_grid_template($all_posts);
 
     $result = [
         'total_page' => $all_posts->max_num_pages, // get total no of pages
@@ -124,4 +89,51 @@ function wp_load_more_posts_handler()
 
     echo json_encode($result);
     die();
+}
+
+function get_post_grid_template($all_posts)
+{
+    $content = '';
+    if ($all_posts->have_posts()) {
+        $post_count = 1;
+        while ($all_posts->have_posts()) : $all_posts->the_post();
+            // Get post data
+            $post_title = get_the_title();
+            // $post_excerpt = wp_trim_words( get_the_content(), 295, '' );
+            $post_excerpt = get_the_excerpt();
+
+            // Limit the excerpt to 20 words
+            $excerpt_words = explode(' ', $post_excerpt);
+            if (count($excerpt_words) > 20) {
+                $post_excerpt = implode(' ', array_slice($excerpt_words, 0, 20));
+                $post_excerpt .= '...'; // Add ellipsis to indicate truncated content
+            }
+
+            $post_permalink = get_permalink();
+            $post_author = get_the_author();
+            $post_date = get_the_date();
+            $post_featured_image = get_the_post_thumbnail();
+
+            $post_id = get_the_ID(); // Get the ID of the current post
+            $featured_image_url = wp_get_attachment_image_src(get_post_thumbnail_id($post_id), 'full')[0];
+
+            // Build the HTML for each post
+            $even_class = $post_count === 2 ? 'wp-post-even-grid' : '';
+
+            $single_grid_class = "wp-post-single-grid " . $even_class;
+            $content .= '<div class="' . $single_grid_class . '">
+                            <h3 class="wp-post-grid-headline">' . $post_title . '</h3>
+                            <p class="wp-post-grid-content">' . $post_excerpt . ' </p>
+                            <span class="wp-post-read-more">
+                                <a class="wp-post-read-more-link" href="' . $post_permalink . '">Learn More &raquo;</a>
+                            </span>
+                            <img class="wp-post-grid-image"
+                            src="' . $featured_image_url . '"
+                            alt="">
+                        </div>';
+            $post_count++;
+        endwhile;
+    }
+
+    return     $content;
 }

@@ -1,0 +1,117 @@
+.wp-post-single-grid {
+    display: grid;
+    grid-template-areas: 'image' 'headline' 'text' 'button';
+    text-align: center;
+    padding-bottom: 36px;
+}
+
+.wp-post-grid-image {
+    grid-area: image;
+    z-index: 0;
+    align-self: stretch;
+    object-fit: cover;
+    height: 300px;
+}
+
+.wp-post-grid-headline {
+    grid-area: headline;
+    z-index: 1;
+    margin-left: 1rem;
+    margin-right: 1rem;
+    align-self: end;
+}
+
+.wp-post-grid-content {
+    grid-area: text;
+    z-index: 1;
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+
+.wp-post-read-more {
+    grid-area: button;
+    margin-left: 1rem;
+    margin-right: 1rem;
+    z-index: 1;
+    color: tomato;
+    font-size: 1.5rem;
+}
+
+.wp-post-alternative-grids {
+    max-width: 1200px;
+}
+
+/* Add a line between rows */
+.wp-post-single-grid:nth-child(n+2) {
+    border-top: 1px solid #1a1819;
+    padding-top: 35px;
+}
+
+@media (min-width: 640px) and (max-width: 1024px) {
+    .wp-post-alternative-grids {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-gap: 1rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .wp-post-alternative-grids {
+        width: 95vw;
+        margin: auto;
+    }
+
+    .wp-post-single-grid {
+        background-color: transparent;
+        color: black;
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas: '........ image' 'headline image' 'text     image' 'button   image' '........ image';
+        grid-column-gap: 20px;
+        text-align: left;
+    }
+
+    .wp-post-single-grid.wp-post-even-grid {
+        grid-template-areas: 'image ....' 'image headline' 'image text' 'image button' 'image ....';
+    }
+
+    .wp-post-grid-image {
+        object-fit: contain;
+    }
+}
+
+
+.wp-post-alternative-grids p {
+    line-height: 1.4em;
+    margin-bottom: 0.75em;
+}
+
+.wp-post-alternative-grids img {
+    max-width: 100%;
+}
+
+
+.wp-post-alternative-grids .wp-post-grid-headline {
+    font-size: 2rem;
+    margin-bottom: 0.5em;
+}
+
+.wp-post-alternative-grids .wp-post-read-more-link {
+    display: inline-block;
+    color: #000;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 30px;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    background: #fec52e;
+    padding: 3px 10px;
+    margin: 10px 0 0;
+}
+
+.wp-post-grid-load-more {
+    text-align: center;
+}
+
+.wp-post-grid-load-more a {
+    text-decoration: none;
+}

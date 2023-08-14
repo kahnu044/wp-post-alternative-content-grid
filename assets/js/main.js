@@ -22,7 +22,7 @@ jQuery(document).ready(function () {
                 if (responseData.total_page <= currentPage) {
                     jQuery('#wp-load-more-post').hide();
                 }
-                jQuery('.wp-grid-post-list').append(responseData.content);
+                jQuery('.wp-post-alternative-grids').append(responseData.content);
             }
         });
     });
