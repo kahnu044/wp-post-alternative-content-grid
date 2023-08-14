@@ -114,4 +114,7 @@
 
 .wp-post-grid-load-more a {
     text-decoration: none;
+        padding: 10px;
+    border: 1px solid #1a1819;
+    color: #1a1819;
 }
