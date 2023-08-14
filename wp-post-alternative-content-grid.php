@@ -56,17 +56,20 @@ function wp_post_custom_post_grid_handler($atts, $content = null)
 
     if ($all_posts->found_posts > 0) {
         $content .= get_post_grid_template($all_posts);
-
-        $content .= '<div class="wp-post-grid-load-more">
-                    <a href="#!" data-post-type="' . $post_type . '" class="btn" id="wp-load-more-post">Load more</a>
-                </div>';
-    }else{
+    } else {
         $content .= 'No Content found';
     }
 
     wp_reset_postdata();
 
     $content .= '</section>';
+
+    // Check if there are more posts than posts_per_page
+    if ($all_posts->found_posts > $atts['posts_per_page']) {
+        $content .= '<div class="wp-post-grid-load-more">
+                <a href="#!" data-post-type="' . $post_type . '" class="btn" id="wp-load-more-post">Load more</a>
+            </div>';
+    }
     return $content;
 }
 
