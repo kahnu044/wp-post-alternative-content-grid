@@ -35,31 +35,37 @@ function wp_post_custom_post_grid_handler($atts, $content = null)
 {
     $atts = shortcode_atts(
         array(
-            'total' => 10,
+            'post_type' => 'post',
+            'posts_per_page' => 6,
             'alternate_content' => 'yes',
         ),
         $atts
     );
 
+    $post_type = $atts['post_type'] ? $atts['post_type'] : 'post';
+
     $content = '<section class="wp-post-alternative-grids">';
 
     $all_posts = new WP_Query([
-        'post_type' => 'post',
-        'posts_per_page' => 2,
+        'post_type' => $post_type,
+        'posts_per_page' => $atts['posts_per_page'],
         'orderby' => 'date',
         'order' => 'ASC',
         'paged' => 1,
     ]);
 
-    $content .= get_post_grid_template($all_posts);
+    if ($all_posts->found_posts > 0) {
+        $content .= get_post_grid_template($all_posts);
 
-    $content .= '</section>';
+        $content .= '<div class="wp-post-grid-load-more">
+                    <a href="#!" data-post-type="' . $post_type . '" class="btn" id="wp-load-more-post">Load more</a>
+                </div>';
+    }else{
+        $content .= 'No Content found';
+    }
+
     wp_reset_postdata();
 
-
-    $content .= '<div class="wp-post-grid-load-more">
-                    <a href="#!" class="btn" id="wp-load-more-post">Load more</a>
-                </div>';
     $content .= '</section>';
     return $content;
 }
@@ -74,7 +80,7 @@ function wp_load_more_posts_handler()
 {
     $all_posts = new WP_Query([
         'post_type' => 'post',
-        'posts_per_page' => 2,
+        'posts_per_page' => 6,
         'orderby' => 'date',
         'order' => 'DESC',
         'paged' => $_POST['paged'],
@@ -99,10 +105,9 @@ function get_post_grid_template($all_posts)
         while ($all_posts->have_posts()) : $all_posts->the_post();
             // Get post data
             $post_title = get_the_title();
-            // $post_excerpt = wp_trim_words( get_the_content(), 295, '' );
-            $post_excerpt = get_the_excerpt();
 
             // Limit the excerpt to 20 words
+            $post_excerpt = get_the_excerpt();
             $excerpt_words = explode(' ', $post_excerpt);
             if (count($excerpt_words) > 20) {
                 $post_excerpt = implode(' ', array_slice($excerpt_words, 0, 20));
@@ -110,15 +115,15 @@ function get_post_grid_template($all_posts)
             }
 
             $post_permalink = get_permalink();
-            $post_author = get_the_author();
-            $post_date = get_the_date();
-            $post_featured_image = get_the_post_thumbnail();
+            // $post_author = get_the_author();
+            // $post_date = get_the_date();
+            // $post_featured_image = get_the_post_thumbnail();
 
             $post_id = get_the_ID(); // Get the ID of the current post
             $featured_image_url = wp_get_attachment_image_src(get_post_thumbnail_id($post_id), 'full')[0];
 
             // Build the HTML for each post
-            $even_class = $post_count === 2 ? 'wp-post-even-grid' : '';
+            $even_class = $post_count % 2 == 0 ? 'wp-post-even-grid' : '';
 
             $single_grid_class = "wp-post-single-grid " . $even_class;
             $content .= '<div class="' . $single_grid_class . '">
