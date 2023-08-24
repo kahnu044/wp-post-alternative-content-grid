@@ -38,6 +38,8 @@ function wp_post_custom_post_grid_handler($atts, $content = null)
             'post_type' => 'post',
             'posts_per_page' => 6,
             'alternate_content' => 'yes',
+            'orderby' => 'date',
+            'order' => 'DESC'
         ),
         $atts
     );
@@ -49,8 +51,8 @@ function wp_post_custom_post_grid_handler($atts, $content = null)
     $all_posts = new WP_Query([
         'post_type' => $post_type,
         'posts_per_page' => $atts['posts_per_page'],
-        'orderby' => 'date',
-        'order' => 'ASC',
+        'orderby' => $atts['orderby'],
+        'order' => $atts['order'],
         'paged' => 1,
     ]);
 
